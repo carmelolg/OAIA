@@ -1,5 +1,7 @@
 # Generative AI Agentic Architecture
 
+![OAIA Logo](static/logo.svg)
+
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 [![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](https://github.com/yourusername/OAIA)
 
