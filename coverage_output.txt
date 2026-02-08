@@ -1,0 +1,59 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.5, pytest-7.4.0, pluggy-1.6.0
+rootdir: /Users/carmelolg/workspace/workspace-python/OAIA
+configfile: pytest.ini
+plugins: anyio-4.9.0, cov-4.1.0, mock-3.12.0, langsmith-0.4.33
+collected 60 items
+
+tests/lib/adapters/outbound/test_LLMExecutor.py ....                     [  6%]
+tests/lib/commons/test_Constants.py ...                                  [ 11%]
+tests/lib/commons/test_EnvironmentVariables.py .........                 [ 26%]
+tests/lib/commons/test_MathUtils.py .........                            [ 41%]
+tests/lib/core/integration/http/test_GenericHttpService.py ....          [ 48%]
+tests/lib/core/providers/test_LLMProviderFactory.py ..                   [ 51%]
+tests/lib/core/providers/test_OllamaProvider.py ......                   [ 61%]
+tests/lib/core/providers/model/test_LLMProviderConfiguration.py .......  [ 73%]
+tests/lib/core/service/test_KnowledgeService.py .....                    [ 81%]
+tests/lib/use_case/prompts/test_FilePromptManager.py ......              [ 91%]
+tests/lib/use_case/steps/test_StepResult.py .....                        [100%]
+
+---------- coverage: platform darwin, python 3.13.5-final-0 ----------
+Name                                                   Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------
+lib/__init__.py                                            0      0   100%
+lib/adapters/__init__.py                                   0      0   100%
+lib/adapters/outbound/LLMExecutor.py                      34      0   100%
+lib/adapters/outbound/__init__.py                          0      0   100%
+lib/commons/Constants.py                                  12      0   100%
+lib/commons/EnvironmentVariables.py                       33      0   100%
+lib/commons/MathUtils.py                                  17      0   100%
+lib/commons/__init__.py                                    0      0   100%
+lib/core/__init__.py                                       0      0   100%
+lib/core/integration/__init__.py                           0      0   100%
+lib/core/integration/http/GenericHttpService.py           18      0   100%
+lib/core/integration/http/__init__.py                      0      0   100%
+lib/core/providers/LLMProvider.py                         16      6    62%   32-41, 68, 88, 104
+lib/core/providers/LLMProviderFactory.py                  13      0   100%
+lib/core/providers/OllamaProvider.py                      43      1    98%   102
+lib/core/providers/__init__.py                             0      0   100%
+lib/core/providers/model/LLMProviderConfiguration.py      20      0   100%
+lib/core/providers/model/__init__.py                       0      0   100%
+lib/core/service/KnowledgeService.py                      39      0   100%
+lib/core/service/__init__.py                               0      0   100%
+lib/use_case/__init__.py                                   0      0   100%
+lib/use_case/integration/__init__.py                       0      0   100%
+lib/use_case/integration/http/__init__.py                  0      0   100%
+lib/use_case/prompts/FilePromptManager.py                 14      0   100%
+lib/use_case/prompts/PromptManager.py                      8      2    75%   17, 27
+lib/use_case/prompts/__init__.py                           0      0   100%
+lib/use_case/runner/AbstractRunner.py                      6      6     0%   1-23
+lib/use_case/runner/__init__.py                            0      0   100%
+lib/use_case/steps/AbstractStep.py                         7      7     0%   8-38
+lib/use_case/steps/StepResult.py                          18      0   100%
+lib/use_case/steps/__init__.py                             0      0   100%
+lib/use_case/tools/__init__.py                             0      0   100%
+------------------------------------------------------------------------------------
+TOTAL                                                    298     22    93%
+
+
+============================== 60 passed in 0.23s ==============================
