@@ -44,3 +44,22 @@ class GenericHttpService:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
 
+    def post(self, api_host: str, api_path: str, fallback_path: str) -> Any:
+        """Placeholder for POST method implementation."""
+        raise NotImplementedError("POST method is not implemented yet.")
+
+    def put(self, api_host: str, api_path: str, fallback_path: str) -> Any:
+        """Placeholder for PUT method implementation."""
+        raise NotImplementedError("PUT method is not implemented yet.")
+
+    def delete(self, api_host: str, api_path: str, fallback_path: str) -> Any:
+        """Placeholder for DELETE method implementation."""
+        raise NotImplementedError("DELETE method is not implemented yet.")
+
+    def patch(self, api_host: str, api_path: str, fallback_path: str) -> Any:
+        """Placeholder for PATCH method implementation."""
+        raise NotImplementedError("PATCH method is not implemented yet.")
+
+    def options(self, api_host: str, api_path: str, fallback_path: str) -> Any:
+        """Placeholder for OPTIONS method implementation."""
+        raise NotImplementedError("OPTIONS method is not implemented yet.")

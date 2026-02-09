@@ -21,7 +21,7 @@ class LLMProviderFactory:
     Factory class to get the appropriate LLM provider instance based on configuration.
 
     This class uses the LLM_PROVIDER environment variable to determine which provider
-    to instantiate. Currently supports Ollama provider.
+    to instantiate. Currently, supports Ollama provider.
     """
     @staticmethod
     def get_instance():
