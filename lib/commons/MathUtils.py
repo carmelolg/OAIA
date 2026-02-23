@@ -16,17 +16,17 @@ class MathUtils(object):
 
     __instance = None
 
-    @staticmethod
-    def get_instance():
+    @classmethod
+    def get_instance(cls):
         """
         Get the singleton instance of MathUtils.
 
         Returns:
             MathUtils: The singleton instance of the MathUtils class.
         """
-        if MathUtils.__instance is None:
-            MathUtils()
-        return MathUtils.__instance
+        if cls.__instance is None:
+            cls()
+        return cls.__instance
 
     def __init__(self):
         """

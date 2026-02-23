@@ -22,7 +22,8 @@ class TestLLMExecutor:
     def test_ask_method(self, mock_provider):
         """Test the ask method."""
         mock_provider.chat.return_value = "response"
-        result = LLMExecutor.ask("test prompt", system_prompt="system", chatbot_mode=True, disable_think=False)
+        executor = LLMExecutor.get_instance()
+        result = executor.ask("test prompt", system_prompt="system", chatbot_mode=True, disable_think=False)
         mock_provider.chat.assert_called_once()
         args, kwargs = mock_provider.chat.call_args
         assert kwargs['prompt'] == "test prompt"
@@ -39,7 +40,8 @@ class TestLLMExecutor:
         """Test the chat method."""
         mock_provider.chat.return_value = "response"
         tools = {"tool1": "func"}
-        result = LLMExecutor.chat("test prompt", chatbot_mode=False, tools=tools, system_prompt="system", disable_think=True)
+        executor = LLMExecutor.get_instance()
+        result = executor.chat("test prompt", chatbot_mode=False, tools=tools, system_prompt="system", disable_think=True)
         mock_provider.chat.assert_called_once()
         args, kwargs = mock_provider.chat.call_args
         assert kwargs['prompt'] == "test prompt"

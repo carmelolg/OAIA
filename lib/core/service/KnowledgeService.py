@@ -24,8 +24,7 @@ class KnowledgeService(object):
             cls._instance = super(KnowledgeService, cls).__new__(cls)
         return cls._instance
 
-    @staticmethod
-    def build_knowledge(dataset):
+    def build_knowledge(self, dataset):
         """Builds a knowledge graph from a dataset.
         Args: dataset (list): A list of lines.
         """
@@ -35,8 +34,7 @@ class KnowledgeService(object):
             knowledge.append((chunk, embedding))
         return knowledge
 
-    @staticmethod
-    def get_most_relevant_chunks(query, knowledge, top_n=3):
+    def get_most_relevant_chunks(self, query, knowledge, top_n=3):
             """Finds the most relevant chunks from a knowledge base based on a query.
 
             Args:
@@ -62,8 +60,7 @@ class KnowledgeService(object):
             # Finally, return the top N most relevant chunks
             return similarities[:top_n]
 
-    @staticmethod
-    def get_best_matching_chunk(query, chunks):
+    def get_best_matching_chunk(self, query, chunks):
         """Finds the best matching chunk from a list of chunks based on a query.
 
         Args:
