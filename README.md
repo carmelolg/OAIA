@@ -3,7 +3,7 @@
 ![OAIA Logo](static/logo.svg)
 
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
-[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](https://github.com/yourusername/OAIA)
+[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen)](https://github.com/carmelolg/OAIA)
 
 This project provides a Python library template/scaffold for organizing and generalizing the usage of Large Language Models (LLMs) and Ollama (or other providers like LangChain) in a structured, modular way.
 
