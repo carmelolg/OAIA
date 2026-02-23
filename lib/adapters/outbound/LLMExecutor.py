@@ -27,7 +27,7 @@ class LLMExecutor(object):
     """
     Singleton class for executing interactions with Large Language Models.
 
-    This class provides static methods to perform simple chat interactions or tool-enabled chats
+    This class provides instance methods to perform simple chat interactions or tool-enabled chats
     with the configured LLM. It ensures only one instance exists and handles configuration
     such as thinking mode, streaming, and tool functions.
 
@@ -37,17 +37,17 @@ class LLMExecutor(object):
 
     __instance = None
 
-    @staticmethod
-    def get_instance():
+    @classmethod
+    def get_instance(cls):
         """
         Get the singleton instance of LLMExecutor.
 
         Returns:
             LLMExecutor: The singleton instance.
         """
-        if LLMExecutor.__instance is None:
-            LLMExecutor()
-        return LLMExecutor.__instance
+        if cls.__instance is None:
+            cls()
+        return cls.__instance
 
     def __init__(self):
         """
@@ -61,8 +61,7 @@ class LLMExecutor(object):
         else:
             LLMExecutor.__instance = self
 
-    @staticmethod
-    def ask(prompt: str, system_prompt: str = None, chatbot_mode: bool = False, disable_think: bool = False):
+    def ask(self, prompt: str, system_prompt: str = None, chatbot_mode: bool = False, disable_think: bool = False):
         """
         Perform a simple chat interaction with the LLM.
 
@@ -82,8 +81,7 @@ class LLMExecutor(object):
         config: ProviderConfiguration = ProviderConfiguration(think=bool(enable_think), stream=chatbot_mode)
         return current_provider.chat(prompt=prompt, system_prompt=system_prompt, model=llm, config=config)
 
-    @staticmethod
-    def chat(prompt: str, chatbot_mode: bool = True, tools: dict = None, system_prompt: str = None, disable_think: bool = False):
+    def chat(self, prompt: str, chatbot_mode: bool = True, tools: dict = None, system_prompt: str = None, disable_think: bool = False):
         """
         Perform a chat interaction with the LLM, optionally incorporating tool calls.
 

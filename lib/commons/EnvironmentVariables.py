@@ -3,7 +3,7 @@ Module to load environment variables from a .env file.
 
 This module provides a singleton EnvironmentVariables class that loads environment variables
 from a .env file using the python-dotenv library. It ensures that the .env file is loaded only once
-and provides static methods to retrieve various configuration values used throughout the application.
+and provides instance methods to retrieve various configuration values used throughout the application.
 """
 
 import os
@@ -14,7 +14,7 @@ class EnvironmentVariables:
     Singleton class for managing environment variables.
 
     This class loads environment variables from a .env file once at instantiation and provides
-    static methods to access them with optional default values. It follows the singleton pattern
+    instance methods to access them with optional default values. It follows the singleton pattern
     to ensure the .env file is loaded only once.
 
     Attributes:
@@ -37,8 +37,7 @@ class EnvironmentVariables:
             load_dotenv()  # Load .env once at initialization
         return cls._instance
 
-    @staticmethod
-    def get_embedding_model(default: str = None) -> str:
+    def get_embedding_model(self, default: str = None) -> str:
         """
         Get the embedding model name from environment variables.
 
@@ -50,8 +49,7 @@ class EnvironmentVariables:
         """
         return os.getenv("EMBEDDING_MODEL", default)
 
-    @staticmethod
-    def get_language_model(default: str = None) -> str:
+    def get_language_model(self, default: str = None) -> str:
         """
         Get the language model name from environment variables.
 
@@ -63,8 +61,7 @@ class EnvironmentVariables:
         """
         return os.getenv("LANGUAGE_MODEL", default)
 
-    @staticmethod
-    def get_thinking_mode(default: str = None) -> str:
+    def get_thinking_mode(self, default: str = None) -> str:
         """
         Get the thinking mode setting from environment variables.
 
@@ -76,8 +73,7 @@ class EnvironmentVariables:
         """
         return os.getenv("THINKING_MODE", default)
 
-    @staticmethod
-    def get_kindergarten_api_host(default: str = None) -> str:
+    def get_kindergarten_api_host(self, default: str = None) -> str:
         """
         Get the kindergarten API host from environment variables.
 
@@ -89,8 +85,7 @@ class EnvironmentVariables:
         """
         return os.getenv("KINDERGARTEN_API_HOST", default)
 
-    @staticmethod
-    def get_home_kitchen_api_host(default: str = None) -> str:
+    def get_home_kitchen_api_host(self, default: str = None) -> str:
         """
         Get the home kitchen API host from environment variables.
 
@@ -102,8 +97,7 @@ class EnvironmentVariables:
         """
         return os.getenv("HOME_KITCHEN_API_HOST", default)
 
-    @staticmethod
-    def get_kindergarten_api_path(default: str = None) -> str:
+    def get_kindergarten_api_path(self, default: str = None) -> str:
         """
         Get the kindergarten API path from environment variables.
 
@@ -115,8 +109,7 @@ class EnvironmentVariables:
         """
         return os.getenv("KINDERGARTEN_API_PATH", default)
 
-    @staticmethod
-    def get_home_kitchen_api_path(default: str = None) -> str:
+    def get_home_kitchen_api_path(self, default: str = None) -> str:
         """
         Get the home kitchen API path from environment variables.
 
@@ -128,8 +121,7 @@ class EnvironmentVariables:
         """
         return os.getenv("HOME_KITCHEN_API_PATH", default)
 
-    @staticmethod
-    def get_llm_provider(default: str = None) -> str:
+    def get_llm_provider(self, default: str = None) -> str:
         """
         Get the LLM provider name from environment variables.
 
