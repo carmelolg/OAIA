@@ -35,6 +35,7 @@ lib/
 │   │   ├── LLMProvider.py          # Abstract base class for LLM providers
 │   │   ├── LLMProviderFactory.py   # Factory for provider instances
 │   │   ├── OllamaProvider.py       # Ollama-specific provider implementation
+│   │   ├── LiteLLMProvider.py      # LiteLLM provider (100+ backends via unified interface)
 │   │   └── model/
 │   │       └── LLMProviderConfiguration.py  # Configuration for providers
 │   └── service/
@@ -110,6 +111,74 @@ relevant = ks.get_most_relevant_chunks("query", knowledge)
 ### Custom Provider
 
 Implement the `Provider` abstract class and register in `LLMProviderFactory`.
+
+## LiteLLM Provider
+
+[LiteLLM](https://www.litellm.ai/) is a Python SDK that routes requests to 100+ LLMs
+(OpenAI, Anthropic, xAI, Azure OpenAI, Vertex AI, Ollama, and more) through a unified
+OpenAI-compatible interface.
+
+### Enabling LiteLLM
+
+Set `LLM_PROVIDER=litellm` in your `.env` file and choose a model using LiteLLM's
+`<provider>/<model>` format:
+
+```
+LLM_PROVIDER=litellm
+LANGUAGE_MODEL=openai/gpt-4o
+OPENAI_API_KEY=your-openai-key
+```
+
+### Example configurations
+
+**OpenAI via LiteLLM**
+```
+LLM_PROVIDER=litellm
+LANGUAGE_MODEL=openai/gpt-4o
+OPENAI_API_KEY=your-openai-key
+```
+
+**Anthropic via LiteLLM**
+```
+LLM_PROVIDER=litellm
+LANGUAGE_MODEL=anthropic/claude-3-sonnet-20240229
+ANTHROPIC_API_KEY=your-anthropic-key
+```
+
+**Ollama local model via LiteLLM**
+```
+LLM_PROVIDER=litellm
+LANGUAGE_MODEL=ollama/llama2
+LITELLM_API_BASE=http://localhost:11434
+```
+
+**Azure OpenAI via LiteLLM**
+```
+LLM_PROVIDER=litellm
+LANGUAGE_MODEL=azure/your-deployment-name
+AZURE_API_KEY=your-azure-key
+AZURE_API_BASE=https://your-resource.openai.azure.com
+AZURE_API_VERSION=2024-02-01
+```
+
+### Required environment variables per backend
+
+| Backend | Environment variable(s) |
+|---------|-------------------------|
+| OpenAI | `OPENAI_API_KEY` |
+| Anthropic | `ANTHROPIC_API_KEY` |
+| xAI | `XAI_API_KEY` |
+| Azure OpenAI | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` |
+| Vertex AI | `VERTEXAI_PROJECT`, `VERTEXAI_LOCATION` |
+| NVIDIA NIM | `NVIDIA_NIM_API_KEY`, `NVIDIA_NIM_API_BASE` |
+| HuggingFace | `HUGGINGFACE_API_KEY` |
+| OpenRouter | `OPENROUTER_API_KEY` |
+| Ollama | `LITELLM_API_BASE` (if not `http://localhost:11434`) |
+
+### Streaming
+
+LiteLLM streaming works the same way as with other providers — set `chatbot_mode=True`
+when calling `LLMExecutor.ask()` or `LLMExecutor.chat()`.
 
 ## Docker
 
