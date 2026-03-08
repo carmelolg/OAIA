@@ -5,6 +5,9 @@ This module provides the LiteLLMProvider class, which implements the Provider in
 using the LiteLLM Python SDK. LiteLLM supports 100+ LLMs (OpenAI, Anthropic, xAI,
 VertexAI, Ollama, etc.) through a unified OpenAI-compatible interface.
 
+All chat responses are normalized to LLMResponse so that callers receive a consistent,
+provider-agnostic payload regardless of the underlying backend.
+
 Environment variables required per backend (examples):
     - OpenAI:        OPENAI_API_KEY
     - Anthropic:     ANTHROPIC_API_KEY
@@ -30,6 +33,7 @@ import litellm
 
 from lib.core.providers.LLMProvider import Provider
 from lib.core.providers.model.LLMProviderConfiguration import ProviderConfiguration
+from lib.core.providers.model.LLMResponse import LLMResponse
 
 
 class LiteLLMProvider(Provider):
@@ -44,6 +48,9 @@ class LiteLLMProvider(Provider):
     "anthropic/claude-3-sonnet-20240229", "ollama/llama2"). An optional
     LITELLM_API_BASE environment variable can be set to route requests to a
     custom gateway or local server (e.g. Ollama at http://localhost:11434).
+
+    All chat methods return :class:`LLMResponse` (or a generator of :class:`LLMResponse`
+    for streaming) so that downstream code is provider-agnostic.
 
     Attributes:
         __instance: The singleton instance of the class.
@@ -84,13 +91,59 @@ class LiteLLMProvider(Provider):
         """
         return os.getenv("LITELLM_API_BASE", None)
 
+    @staticmethod
+    def _normalize_response(raw) -> LLMResponse:
+        """
+        Normalize a raw LiteLLM ModelResponse to LLMResponse.
+
+        Args:
+            raw: A non-streaming LiteLLM ModelResponse object.
+
+        Returns:
+            LLMResponse: The normalized response.
+        """
+        msg = raw.choices[0].message
+        usage_data = getattr(raw, 'usage', None)
+        return LLMResponse(
+            content=msg.content or "",
+            role=msg.role or "assistant",
+            finish_reason=raw.choices[0].finish_reason,
+            usage={
+                "prompt_tokens": getattr(usage_data, 'prompt_tokens', None),
+                "completion_tokens": getattr(usage_data, 'completion_tokens', None),
+                "total_tokens": getattr(usage_data, 'total_tokens', None),
+            } if usage_data else None,
+        )
+
+    @staticmethod
+    def _normalize_stream(raw_stream) -> Iterator[LLMResponse]:
+        """
+        Wrap a streaming LiteLLM response in a generator that yields LLMResponse chunks.
+
+        Args:
+            raw_stream: An iterable of LiteLLM streaming chunk objects.
+
+        Yields:
+            LLMResponse: One normalized chunk per streaming event.
+        """
+        for chunk in raw_stream:
+            choice = chunk.choices[0]
+            delta = choice.delta
+            done = choice.finish_reason is not None
+            yield LLMResponse(
+                content=getattr(delta, 'content', None) or "",
+                role=getattr(delta, 'role', None) or "assistant",
+                done=done,
+                finish_reason=choice.finish_reason,
+            )
+
     def simple_chat(
         self,
         prompt: str,
         model: str,
         system_prompt: str = None,
         config: ProviderConfiguration = None,
-    ) -> Any:
+    ) -> Union[LLMResponse, Iterator[LLMResponse]]:
         """
         Perform a simple chat without tools using LiteLLM.
 
@@ -101,8 +154,7 @@ class LiteLLMProvider(Provider):
             config (ProviderConfiguration, optional): Configuration for the chat.
 
         Returns:
-            Any: The LiteLLM ModelResponse, or a streaming generator when
-            config.get_stream() is True.
+            Union[LLMResponse, Iterator[LLMResponse]]: Normalized response or streaming generator.
 
         Raises:
             litellm.AuthenticationError: When API key is missing or invalid.
@@ -126,7 +178,10 @@ class LiteLLMProvider(Provider):
             kwargs["api_base"] = api_base
 
         print(f"LiteLLMProvider: calling model='{model}' stream={stream}")
-        return litellm.completion(**kwargs)
+        raw = litellm.completion(**kwargs)
+        if stream:
+            return self._normalize_stream(raw)
+        return self._normalize_response(raw)
 
     def agentic_chat(
         self,
@@ -136,7 +191,7 @@ class LiteLLMProvider(Provider):
         assistant_prompt: str,
         tools: dict,
         config: ProviderConfiguration = None,
-    ) -> Any:
+    ) -> Union[LLMResponse, Iterator[LLMResponse]]:
         """
         Perform an agentic chat with tool calls using LiteLLM.
 
@@ -155,8 +210,7 @@ class LiteLLMProvider(Provider):
             config (ProviderConfiguration, optional): Configuration for the chat.
 
         Returns:
-            Any: The final LiteLLM ModelResponse, or a streaming generator when
-            config.get_stream() is True.
+            Union[LLMResponse, Iterator[LLMResponse]]: Normalized response or streaming generator.
 
         Raises:
             litellm.AuthenticationError: When API key is missing or invalid.
@@ -213,7 +267,10 @@ class LiteLLMProvider(Provider):
         final_kwargs = dict(base_kwargs)
         final_kwargs["messages"] = _messages
         final_kwargs["stream"] = stream
-        return litellm.completion(**final_kwargs)
+        raw_final = litellm.completion(**final_kwargs)
+        if stream:
+            return self._normalize_stream(raw_final)
+        return self._normalize_response(raw_final)
 
     def embed(self, text: str, embedding_model: str) -> List[float]:
         """
