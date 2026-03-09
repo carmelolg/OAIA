@@ -40,5 +40,5 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add README.md
+        git add README.md coverage_output.txt
         git commit -m "Update coverage badge to ${COVERAGE}%" || echo "No changes to commit"
