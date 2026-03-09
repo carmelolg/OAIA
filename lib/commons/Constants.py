@@ -4,7 +4,7 @@ Constants Module
 This module defines a singleton Constants class that holds application-wide constant values.
 It ensures that only one instance of the class exists, providing a centralized place for constants.
 
-Currently, it defines the LLM provider name for Ollama.
+Currently, it defines the LLM provider names for Ollama and LiteLLM.
 """
 
 class Constants(object):
@@ -16,9 +16,11 @@ class Constants(object):
 
     Attributes:
         llm_provider_ollama (str): The string identifier for the Ollama LLM provider.
+        llm_provider_litellm (str): The string identifier for the LiteLLM provider.
     """
 
     llm_provider_ollama = "ollama"
+    llm_provider_litellm = "litellm"
 
     __instance = None
 
