@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: write
 
 jobs:
   test:
@@ -12,6 +18,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -25,20 +33,40 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        python -m pytest --cov=lib --cov-report=term-missing > coverage_output.txt
+        python -m pytest -o "addopts=" \
+          --cov=lib \
+          --cov-report=term-missing \
+          --cov-report=json:coverage.json
 
     - name: Extract coverage percentage
+      id: coverage
       run: |
-        COVERAGE=$(grep "TOTAL" coverage_output.txt | awk '{print $4}' | sed 's/%//')
-        echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
+        echo "Parsing coverage from coverage.json..."
+        COVERAGE=$(python scripts/ci/parse_coverage.py coverage.json)
+        if [ -z "$COVERAGE" ]; then
+          echo "ERROR: Failed to extract coverage percentage" >&2
+          exit 1
+        fi
+        echo "Coverage: ${COVERAGE}%"
+        echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
+        echo "percentage=${COVERAGE}" >> $GITHUB_OUTPUT
 
     - name: Update README badge
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
-        sed -i "s/XX/${COVERAGE}/" README.md
+        echo "Updating README coverage badge to ${COVERAGE}%..."
+        sed -i 's/coverage-[0-9][0-9.]*%25-/coverage-'"${COVERAGE}"'%25-/' README.md
 
-    - name: Commit changes
+    - name: Commit and push changes
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add README.md coverage_output.txt
-        git commit -m "Update coverage badge to ${COVERAGE}%" || echo "No changes to commit"
+        git add README.md
+        if git diff --staged --quiet; then
+          echo "No changes to commit - coverage percentage unchanged (${COVERAGE}%)"
+        else
+          git commit -m "ci: update coverage badge to ${COVERAGE}%"
+          git push
+          echo "README.md updated and pushed with coverage ${COVERAGE}%"
+        fi
