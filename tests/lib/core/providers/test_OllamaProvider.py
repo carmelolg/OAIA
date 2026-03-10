@@ -136,3 +136,29 @@ class TestOllamaProvider:
         result = provider.embed("text", "embed_model")
         mock_embed.assert_called_once_with(model="embed_model", input="text")
         assert result == ['vec']
+
+    @patch('lib.core.providers.OllamaProvider.OllamaClient.chat')
+    def test_agentic_chat_unknown_tool(self, mock_chat, capsys):
+        """Test agentic_chat prints a warning for unknown tool names."""
+        mock_response = MagicMock()
+        mock_tool_call = MagicMock()
+        mock_tool_call.function.name = "unknown_tool"
+        mock_tool_call.function.arguments = {"arg": "val"}
+        mock_response.message.tool_calls = [mock_tool_call]
+
+        mock_final_raw = MagicMock()
+        mock_final_raw.message.content = "Done"
+        mock_final_raw.message.role = "assistant"
+        mock_final_raw.message.thinking = None
+        mock_final_raw.done_reason = "stop"
+        mock_final_raw.prompt_eval_count = 5
+        mock_final_raw.eval_count = 15
+        mock_final_raw.done = True
+
+        mock_chat.side_effect = [mock_response, mock_final_raw]
+        config = ProviderConfiguration(think=False, stream=False)
+        provider = OllamaProvider.get_instance()
+        provider.agentic_chat("prompt", "model", "system", "assistant", {}, config)
+
+        captured = capsys.readouterr()
+        assert "unknown_tool" in captured.out

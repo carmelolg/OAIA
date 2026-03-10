@@ -47,3 +47,33 @@ class TestGenericHttpService:
         service = GenericHttpService()
         result = service.get("", "", "fallback.json")
         assert result is None
+
+    def test_post_raises_not_implemented(self):
+        """Test that post raises NotImplementedError."""
+        service = GenericHttpService()
+        with pytest.raises(NotImplementedError):
+            service.post("http://api.com", "path", "fallback.json")
+
+    def test_put_raises_not_implemented(self):
+        """Test that put raises NotImplementedError."""
+        service = GenericHttpService()
+        with pytest.raises(NotImplementedError):
+            service.put("http://api.com", "path", "fallback.json")
+
+    def test_delete_raises_not_implemented(self):
+        """Test that delete raises NotImplementedError."""
+        service = GenericHttpService()
+        with pytest.raises(NotImplementedError):
+            service.delete("http://api.com", "path", "fallback.json")
+
+    def test_patch_raises_not_implemented(self):
+        """Test that patch raises NotImplementedError."""
+        service = GenericHttpService()
+        with pytest.raises(NotImplementedError):
+            service.patch("http://api.com", "path", "fallback.json")
+
+    def test_options_raises_not_implemented(self):
+        """Test that options raises NotImplementedError."""
+        service = GenericHttpService()
+        with pytest.raises(NotImplementedError):
+            service.options("http://api.com", "path", "fallback.json")
