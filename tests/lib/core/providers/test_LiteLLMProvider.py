@@ -312,6 +312,77 @@ class TestLiteLLMProvider:
         with pytest.raises(_litellm.RateLimitError):
             provider.simple_chat(prompt="Hello", model="openai/gpt-4o", config=config)
 
+    @patch('lib.core.providers.LiteLLMProvider.litellm.completion')
+    def test_agentic_chat_with_assistant_prompt(self, mock_completion):
+        """Test agentic_chat includes assistant_prompt in messages."""
+        mock_first = MagicMock()
+        mock_first.choices[0].message.tool_calls = None
+
+        mock_final_raw = MagicMock()
+        mock_final_raw.choices[0].message.content = "Done"
+        mock_final_raw.choices[0].message.role = "assistant"
+        mock_final_raw.choices[0].finish_reason = "stop"
+        mock_completion.side_effect = [mock_first, mock_final_raw]
+
+        config = ProviderConfiguration(stream=False, think=False)
+        provider = LiteLLMProvider.get_instance()
+        provider.agentic_chat(
+            prompt="Hello",
+            model="openai/gpt-4o",
+            system_prompt=None,
+            assistant_prompt="I am here to help.",
+            tools={},
+            config=config,
+        )
+
+        first_call_messages = mock_completion.call_args_list[0][1]["messages"]
+        assistant_msgs = [m for m in first_call_messages if m.get("role") == "assistant"]
+        assert any(m["content"] == "I am here to help." for m in assistant_msgs)
+
+    @patch.dict('os.environ', {"LITELLM_API_BASE": "http://localhost:11434"})
+    @patch('lib.core.providers.LiteLLMProvider.litellm.completion')
+    def test_agentic_chat_with_api_base(self, mock_completion):
+        """Test that LITELLM_API_BASE is forwarded in agentic_chat."""
+        mock_first = MagicMock()
+        mock_first.choices[0].message.tool_calls = None
+
+        mock_final_raw = MagicMock()
+        mock_final_raw.choices[0].message.content = "Done"
+        mock_final_raw.choices[0].message.role = "assistant"
+        mock_final_raw.choices[0].finish_reason = "stop"
+        mock_completion.side_effect = [mock_first, mock_final_raw]
+
+        config = ProviderConfiguration(stream=False, think=False)
+        provider = LiteLLMProvider.get_instance()
+        provider.agentic_chat(
+            prompt="Hello",
+            model="ollama/llama2",
+            system_prompt=None,
+            assistant_prompt=None,
+            tools={},
+            config=config,
+        )
+
+        first_call_kwargs = mock_completion.call_args_list[0][1]
+        assert first_call_kwargs["api_base"] == "http://localhost:11434"
+
+    @patch.dict('os.environ', {"LITELLM_API_BASE": "http://localhost:11434"})
+    @patch('lib.core.providers.LiteLLMProvider.litellm.embedding')
+    def test_embed_with_api_base(self, mock_embedding):
+        """Test that LITELLM_API_BASE is forwarded to litellm.embedding."""
+        mock_embedding.return_value = MagicMock(
+            data=[{"embedding": [0.4, 0.5, 0.6]}]
+        )
+        provider = LiteLLMProvider.get_instance()
+        result = provider.embed(
+            text="Hello world",
+            embedding_model="ollama/nomic-embed-text",
+        )
+
+        call_kwargs = mock_embedding.call_args[1]
+        assert call_kwargs["api_base"] == "http://localhost:11434"
+        assert result == [0.4, 0.5, 0.6]
+
 
 # ---------------------------------------------------------------------------
 # Helpers to construct LiteLLM error instances without making real API calls
